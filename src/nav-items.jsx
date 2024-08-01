@@ -1,10 +1,10 @@
-import { BarChart2, Database, FileText, Settings, Users, Activity } from "lucide-react";
+import { BarChart2, Database, FileText, Settings as SettingsIcon, Users, Activity } from "lucide-react";
 import Index from "./pages/Index.jsx";
 import DataSources from "./pages/DataSources.jsx";
 import DataModels from "./pages/DataModels.jsx";
 import Monitoring from "./pages/Monitoring.jsx";
 import Collaboration from "./pages/Collaboration.jsx";
-import Settings from "./pages/Settings.jsx";
+import SettingsPage from "./pages/Settings.jsx";
 
 /**
  * Central place for defining the navigation items. Used for navigation components and routing.
@@ -43,7 +43,7 @@ export const navItems = [
   {
     title: "Settings",
     to: "/settings",
-    icon: <Settings className="h-4 w-4" />,
-    page: <Settings />,
+    icon: <SettingsIcon className="h-4 w-4" />,
+    page: <SettingsPage />,
   },
 ];
