@@ -19,53 +19,60 @@ const fromSupabase = async (query) => {
 
 /* supabase integration types
 
-// EXAMPLE TYPES SECTION
-// DO NOT USE TYPESCRIPT
+### workflow_dag
 
-### foos
+| name        | type                    | format | required |
+|-------------|-------------------------|--------|----------|
+| id          | uuid                    | string | true     |
+| name        | character varying(255)  | string | true     |
+| description | text                    | string | false    |
+| nodes       | jsonb                   | object | true     |
+| edges       | jsonb                   | object | true     |
+| created_at  | timestamp with time zone| string | true     |
+| updated_at  | timestamp with time zone| string | true     |
 
-| name    | type | format | required |
-|---------|------|--------|----------|
-| id      | int8 | number | true     |
-| title   | text | string | true     |
-| date    | date | string | true     |
-
-### bars
-
-| name    | type | format | required |
-|---------|------|--------|----------|
-| id      | int8 | number | true     |
-| foo_id  | int8 | number | true     |  // foreign key to foos
-	
 */
 
-// Example hook for models
+// Hooks for workflow_dag
 
-export const useFoo = ()=> useQuery({
-    queryKey: ['foos'],
-    queryFn: fromSupabase(supabase.from('foos')),
-})
-export const useAddFoo = () => {
+export const useWorkflowDags = () => useQuery({
+    queryKey: ['workflow_dags'],
+    queryFn: () => fromSupabase(supabase.from('workflow_dag').select('*')),
+});
+
+export const useWorkflowDag = (id) => useQuery({
+    queryKey: ['workflow_dag', id],
+    queryFn: () => fromSupabase(supabase.from('workflow_dag').select('*').eq('id', id).single()),
+    enabled: !!id,
+});
+
+export const useAddWorkflowDag = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newFoo)=> fromSupabase(supabase.from('foos').insert([{ title: newFoo.title }])),
-        onSuccess: ()=> {
-            queryClient.invalidateQueries('foos');
+        mutationFn: (newDag) => fromSupabase(supabase.from('workflow_dag').insert([newDag])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('workflow_dags');
         },
     });
 };
 
-export const useBar = ()=> useQuery({
-    queryKey: ['bars'],
-    queryFn: fromSupabase(supabase.from('bars')),
-})
-export const useAddBar = () => {
+export const useUpdateWorkflowDag = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newBar)=> fromSupabase(supabase.from('bars').insert([{ foo_id: newBar.foo_id }])),
-        onSuccess: ()=> {
-            queryClient.invalidateQueries('bars');
+        mutationFn: ({ id, ...updateData }) => fromSupabase(supabase.from('workflow_dag').update(updateData).eq('id', id)),
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries(['workflow_dag', variables.id]);
+            queryClient.invalidateQueries('workflow_dags');
         },
     });
 };
 
+export const useDeleteWorkflowDag = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (id) => fromSupabase(supabase.from('workflow_dag').delete().eq('id', id)),
+        onSuccess: () => {
+            queryClient.invalidateQueries('workflow_dags');
+        },
+    });
+};
